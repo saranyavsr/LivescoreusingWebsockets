@@ -11,18 +11,30 @@
         <form>
           <header>Live Score</header>
           <label>Live Sporting Event : Baseball or Cricket match</label>
-          <p id="demo"></p>
-          <button class = button1 onclick="tuneIn()">Tune in</button>
-          <button class = button2 onclick="tuneOut()">Tune out</button>
+          <div style = "margin-left: 20px; font-family: lato; margin-top: 10px">
+            Current Score: 
+            <div id="Score">  </div>
+          </div>
+          <br>
+          <div style = "margin-left: 20px; font-family: lato;">
+            Commentator: 
+            <div id="Comment"> </div>
+          </div>
+          <button class = "button1" onclick="tuneIn()">Tune in</button>
+          <button class = "button2" onclick="tuneOut()">Tune out</button>
         </form>
 
         <script src="/socket.io/socket.io.js"></script>
         <script>
             var socket = io.connect('http://localhost:8080');
 
-            socket.on('chat message', function(msg) {
-                document.getElementById("demo").innerHTML = msg;
-              });
+            socket.on('score', function(msg) {
+              var obj = JSON.parse(msg);
+              var str = "";
+              str += obj["score"] + " runs --- "+ obj["over"]+"."+obj["ball"]+" Overs"; 
+              document.getElementById("Score").innerHTML = str;
+              document.getElementById("Comment").innerHTML = obj["comment"];
+            });
 
             function tuneIn() {
               var xmlHttp = new XMLHttpRequest();
@@ -32,8 +44,6 @@
               }
               xmlHttp.open("GET", 'http://localhost:8080/tuneIn', true); // true for asynchronous 
               xmlHttp.send(null);
-
-              document.getElementById("demo").innerHTML = "Score update will begin now";
             }
 
             function tuneOut() {
@@ -44,8 +54,6 @@
               }
               xmlHttp.open("GET", 'http://localhost:8080/tuneOut', true); // true for asynchronous 
               xmlHttp.send(null);
-
-              document.getElementById("demo").innerHTML = "Score update will end now";
             }
             
         </script>

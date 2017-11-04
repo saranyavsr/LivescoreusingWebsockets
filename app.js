@@ -1,23 +1,29 @@
 var express = require("express");
 var app = express();
 var http = require('http');
+var server = require('http').createServer(app);
 var fs = require('fs');
 var tid;
+var userCount = 0;
+
+var runOption = [-1,0,1,2,3,4,5,6]; 
+var comment = ["Good Shot", "Missed to field", "Classic Text Book Shot", "Hat trick", " Classical Sot", "Unbelievable miss"];
+var Score = Math.floor(Math.random() * 50);
+var Over =  Math.floor(Math.random() * 20);
+var Ball = Math.floor((Math.random() * 6)+1);
 
 app.use(express.static(__dirname + "/public"));
 
-app.get("/", function(httpRequest, httpResponse, next){
-     httpResponse.sendFile(__dirname + "/public/html/index.html");
+app.get("/", function(req, res){
+     res.sendFile(__dirname + "/public/html/index.html");
 })
 
-app.get("/tuneIn", function(httpRequest, httpResponse, next) {
+app.get("/tuneIn", function(req, res) {
 	tid = setInterval(beginUpdates, 5000);
-	httpResponse.emit("Begin updates");
 })
 
-app.get("/tuneOut", function(httpRequest, httpResponse, next) {
+app.get("/tuneOut", function(req, res) {
 	endUpdates();
-    httpResponse.emit("End updates");
 })
 
 // Loading the index file . html displayed to the client
@@ -28,36 +34,68 @@ var io = require('socket.io').listen(server);
 //(server, {path: "/socket-io"});
 
 // When a client connects, we note it in the console
-io.sockets.on('connection', function (socket) {
-    console.log('A client is connected!');
+/*io.sockets.on('connection', function (socket) {
+	console.log("User Connected");
+    
+    socket.on('disconnect', function(data) {
+		console.log("Some user disconnected");
+	});
+}); */
 
-    socket.on('disconnect', function(){
-    console.log('user disconnected');
-  	});
-
-});
 
 function beginUpdates() {
-	let data = scoresArray();
-	var random = data[Math.floor(Math.random() * data.length)];
-	io.emit('chat message', random);
-	console.log('score sent')
+	var obj;
+	
+	if(Over == 20 && Ball == 6){
+		//reset everything to 0
+		Score = 0;
+		Over = 0;
+		Ball = 1;
+		obj = {"score":Score, "over":Over, "ball":Ball, "comment":"Game Restarting"};
+		console.log(JSON.stringify(obj));
+	} else {
+		var newRun = runOption[Math.floor(Math.random() * runOption.length)];
+		
+		if (newRun == -1){
+			Ball++;
+			if(Ball == 7){
+				Ball =1;
+				Over++;
+			}
+			var obj = {"score":Score, "over":Over, "ball":Ball, "comment":"Very good catch by mid-on player"};
+	//		console.log(JSON.stringify(obj));
+		} else if (newRun==0){
+			Score+=newRun;
+			Ball++;
+			if(Ball == 7){
+				Ball =1;
+				Over++;
+			}
+			var obj = {"score":Score, "over":Over, "ball":Ball, "comment":"No Runs Added"};
+	//		console.log(JSON.stringify(obj));
+		} else {
+			Score+=newRun;
+			Ball++;
+			if(Ball == 7){
+				Ball =1;
+				Over++;
+			}
+			if(newRun == 4 || newRun == 6){
+				var obj = {"score":Score, "over":Over, "ball":Ball, "comment":comment[Math.floor(Math.random() * comment.length)]};
+			}
+			else{
+				var temp = "Added "+newRun+" Runs";
+				var obj = {"score":Score, "over":Over, "ball":Ball, "comment":temp};
+			}
+	//		console.log(JSON.stringify(obj));
+		}
+	}
+	io.emit('score', JSON.stringify(obj));
 }
 
 function endUpdates() {
 	console.log('ended score update')
 	clearInterval(tid);
-}
-
-function scoresArray() {
-	return [ "Current Score: 20 runs - 3rd Over<break> Very Good catch by mid-on player",
-	"Current Score: 30 runs - 9th Over<break> Run rate is very low",
-	"Current Score: 10 runs - 2nd Over<break> Nice stop by the keeper",
-	"Current Score: 5 runs - 3rd Over<break> Well played",
-	"Current Score: 12 runs - 3rd Over<break> Good shot",
-	"Current Score: 1 run - 1st Over<break> Well palyed",
-	"Current Score: 9 runs - 2nd Over<break> End of over"
-	]
 }
 
 server.listen(8080);

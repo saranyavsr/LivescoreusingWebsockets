@@ -80,3 +80,9 @@ form label {
   border-radius: 3px;
   cursor: pointer;
 }
+
+#Score, #Comment{
+  font-family: lato;
+  font-size: 1 em;
+  display: inline;
+}
