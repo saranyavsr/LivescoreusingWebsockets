@@ -6,6 +6,8 @@ var fs = require('fs');
 var tid;
 var userCount = 0;
 
+var port = process.env.PORT || 8080;
+
 var runOption = [-1,0,1,2,3,4,5,6]; 
 var comment = ["Good Shot", "Missed to field", "Classic Text Book Shot", "Hat trick", " Classical Sot", "Unbelievable miss"];
 var Score = Math.floor(Math.random() * 50);
@@ -98,4 +100,4 @@ function endUpdates() {
 	clearInterval(tid);
 }
 
-server.listen(8080);
+server.listen(port);
