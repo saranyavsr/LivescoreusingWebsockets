@@ -36,13 +36,13 @@ var io = require('socket.io').listen(server);
 //(server, {path: "/socket-io"});
 
 // When a client connects, we note it in the console
-/*io.sockets.on('connection', function (socket) {
+io.sockets.on('connection', function (socket) {
 	console.log("User Connected");
     
     socket.on('disconnect', function(data) {
 		console.log("Some user disconnected");
 	});
-}); */
+}); 
 
 
 function beginUpdates() {
