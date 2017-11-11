@@ -92,7 +92,7 @@ function beginUpdates() {
 	//		console.log(JSON.stringify(obj));
 		}
 	}
-	socket.emit('score', JSON.stringify(obj));
+	io.socket.broadcast.emit('score', JSON.stringify(obj));
 }
 
 function endUpdates() {
